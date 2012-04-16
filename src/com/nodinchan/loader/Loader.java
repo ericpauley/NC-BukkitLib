@@ -8,6 +8,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.jar.JarEntry;
@@ -18,7 +19,6 @@ import java.util.logging.Logger;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 
-@SuppressWarnings("unchecked")
 /**
  * Loader - Loader base for loading Loadables
  * 
@@ -26,6 +26,7 @@ import org.bukkit.plugin.Plugin;
  *
  * @param <T> A loadable class
  */
+@SuppressWarnings("unchecked")
 public class Loader<T extends Loadable> implements Listener {
 	
 	private final Plugin plugin;
@@ -116,7 +117,39 @@ public class Loader<T extends Loadable> implements Listener {
 		return loadables;
 	}
 	
+	/**
+	 * Registers the Event Listener
+	 * 
+	 * @param loader The Loader to register
+	 */
 	public void register(Loader<T> loader) {
 		plugin.getServer().getPluginManager().registerEvents(loader, plugin);
+	}
+	
+	/**
+	 * Sorts a list of Loadables by name in alphabetical order
+	 * 
+	 * @param loadables The list of Loadables to sort
+	 * 
+	 * @return The sorted list of Loadables
+	 */
+	public List<T> sort(List<T> loadables) {
+		List<T> sortedLoadables = new ArrayList<T>();
+		List<String> names = new ArrayList<String>();
+		
+		for (T t : loadables) {
+			names.add(t.getName());
+		}
+		
+		Collections.sort(names);
+		
+		for (String name : names) {
+			for (T t : loadables) {
+				if (t.getName().equals(name))
+					sortedLoadables.add(t);
+			}
+		}
+		
+		return sortedLoadables;
 	}
 }

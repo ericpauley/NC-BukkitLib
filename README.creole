@@ -1,0 +1,46 @@
+== Loader
+
+-----------------------------------------------------------------------------------------------------------------------
+
+Add and call this method:
+
+<<code java>>
+	public boolean initLoaderLib() {
+		try {
+			File destination = new File(getDataFolder().getParentFile().getParentFile(), "lib");
+			destination.mkdirs();
+			
+			File lib = new File(destination, "Loader.jar");
+			
+			if (!lib.exists()) {
+				System.out.println("Downloading Loader lib...");
+				URL url = new URL("http://dl.dropbox.com/u/62864352/Loader.jar");
+				ReadableByteChannel rbc = Channels.newChannel(url.openStream());
+				FileOutputStream output = new FileOutputStream(new File(destination, "Loader.jar"));
+				output.getChannel().transferFrom(rbc, 0, 1 << 24);
+				System.out.println("Downloaded Loader lib");
+			}
+			
+			URLClassLoader sysLoader = (URLClassLoader) ClassLoader.getSystemClassLoader();
+			
+			for (URL url : sysLoader.getURLs()) {
+				if (url.sameFile(lib.toURI().toURL()))
+					return true;
+			}
+			
+			try {
+				Method method = URLClassLoader.class.getDeclaredMethod("addURL", new Class[] { URL.class });
+				method.setAccessible(true);
+				method.invoke(sysLoader, new Object[] { lib.toURI().toURL() });
+				
+			} catch (Exception e) { return false; }
+			
+			return true;
+			
+		} catch (Exception e) { e.printStackTrace(); }
+		
+		return false;
+	}
+<</code>>
+
+-----------------------------------------------------------------------------------------------------------------------
