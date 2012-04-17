@@ -1,4 +1,4 @@
-package com.nodinchan.loader;
+package com.nodinchan.ncloader;
 
 import java.util.jar.JarFile;
 

@@ -1,4 +1,4 @@
-package com.nodinchan.loader;
+package com.nodinchan.ncloader;
 
 /**
  * Loadable - Base for loadable classes
