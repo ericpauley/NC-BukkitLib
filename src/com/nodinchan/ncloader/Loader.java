@@ -25,7 +25,6 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Enumeration;
 import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
@@ -96,18 +95,12 @@ public class Loader<T extends Loadable> implements Listener {
 		for (File file : files) {
 			try {
 				JarFile jarFile = new JarFile(file);
-				Enumeration<JarEntry> entries = jarFile.entries();
-				
 				String mainClass = null;
 				
-				while (entries.hasMoreElements()) {
-					JarEntry element = entries.nextElement();
-					
-					if (element.getName().equalsIgnoreCase("path.yml")) {
-						BufferedReader reader = new BufferedReader(new InputStreamReader(jarFile.getInputStream(element)));
-						mainClass = reader.readLine().substring(12);
-						break;
-					}
+				if (jarFile.getEntry("path.yml") != null) {
+					JarEntry element = jarFile.getJarEntry("path.yml");
+					BufferedReader reader = new BufferedReader(new InputStreamReader(jarFile.getInputStream(element)));
+					mainClass = reader.readLine().substring(12);
 				}
 				
 				if (mainClass != null) {

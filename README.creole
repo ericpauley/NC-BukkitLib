@@ -25,29 +25,33 @@ Add and call this method in your plugin:
 				
 			} else {
 				JarFile jarFile = new JarFile(lib);
-				Enumeration<JarEntry> entries = jarFile.entries();
 				
 				double version = 0;
 				
-				while (entries.hasMoreElements()) {
-					JarEntry element = entries.nextElement();
-					
-					if (element.getName().equals("version.yml")) {
-						BufferedReader reader = new BufferedReader(new InputStreamReader(jarFile.getInputStream(element)));
-						version = Double.parseDouble(reader.readLine().substring(9).trim());
-					}
-				}
-				
-				if (version == 0) {
-					System.out.println("NC-Loader lib outdated");
-					download = true;
+				if (jarFile.getEntry("version.yml") != null) {
+					JarEntry element = jarFile.getJarEntry("version.yml");
+					BufferedReader reader = new BufferedReader(new InputStreamReader(jarFile.getInputStream(element)));
+					version = Double.parseDouble(reader.readLine().substring(9).trim());
 					
 				} else {
-					HttpURLConnection urlConnection = (HttpURLConnection) new URL("http://www.nodinchan.com/NC-LoaderLib/version.yml").openConnection();
-					BufferedReader reader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
-					
-					if (Double.parseDouble(reader.readLine().replace("NC-LoaderLib Version ", "").trim()) > version)
+					System.out.println("Missing version.yml");
+					download = true;
+				}
+				
+				if (!download) {
+					if (version == 0) {
+						System.out.println("NC-Loader lib outdated");
 						download = true;
+						
+					} else {
+						HttpURLConnection urlConnection = (HttpURLConnection) new URL("http://www.nodinchan.com/NC-LoaderLib/version.yml").openConnection();
+						BufferedReader reader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+						
+						if (Double.parseDouble(reader.readLine().replace("NC-LoaderLib Version ", "").trim()) > version) {
+							System.out.println("NC-Loader lib outdated");
+							download = true;
+						}
+					}
 				}
 			}
 			
