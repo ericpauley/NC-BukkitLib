@@ -5,6 +5,13 @@
 Add and call this method in your plugin:
 
 {{{
+
+	
+	/**
+	 * Initialises the NC-LoaderLib
+	 * 
+	 * @return True if the Lib is initialised
+	 */
 	public boolean initLoaderLib() {
 		try {
 			File destination = new File(getDataFolder().getParentFile().getParentFile(), "lib");
