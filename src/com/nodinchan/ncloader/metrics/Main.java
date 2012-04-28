@@ -1,13 +1,12 @@
-package com.nodinchan.ncloader;
+package com.nodinchan.ncloader.metrics;
 
 import java.lang.reflect.Method;
 
 import org.bukkit.plugin.Plugin;
 
-import com.nodinchan.ncloader.metrics.Metrics;
 import com.nodinchan.ncloader.metrics.Metrics.Graph;
 import com.nodinchan.ncloader.metrics.Metrics.Plotter;
-import com.nodinchan.ncloader.metrics.MetricsLite;
+
 
 public class Main {
 	
@@ -47,7 +46,7 @@ public class Main {
 			return metrics.createGraph(name);
 		}
 		
-		public Plotter createPlotter(String name, final String mthdName, final Object mthdLoc, final Object[] mthdParams) {
+		public Plotter createPlotter(String name, final Method method, final Object mthdLoc, final Object[] mthdParams) {
 			if (metrics == null)
 				return null;
 			
@@ -59,7 +58,6 @@ public class Main {
 						Class<?>[] params = new Class<?>[mthdParams.length];
 						for (int param = 0; param < mthdParams.length; param++) { params[param] = mthdParams[param].getClass(); }
 						
-						Method method = mthdLoc.getClass().getDeclaredMethod(mthdName, params);
 						method.setAccessible(true);
 						return (Integer) method.invoke(mthdLoc, mthdParams);
 						

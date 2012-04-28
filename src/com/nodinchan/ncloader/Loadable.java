@@ -43,4 +43,9 @@ public class Loadable implements Cloneable {
 	public String getName() {
 		return name;
 	}
+	
+	/**
+	 * Called when the Loadable is unloaded
+	 */
+	public void unload() {}
 }

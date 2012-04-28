@@ -91,7 +91,7 @@ public class Loader<T extends Loadable> implements Listener {
 	 * 
 	 * @return List of loaded loadables
 	 */
-	public List<T> load() {
+	public final List<T> load() {
 		for (File file : files) {
 			try {
 				JarFile jarFile = new JarFile(file);
@@ -160,5 +160,12 @@ public class Loader<T extends Loadable> implements Listener {
 		}
 		
 		return sortedLoadables;
+	}
+	
+	/**
+	 * Unloads the Loader
+	 */
+	public void unload() {
+		loadables.clear();
 	}
 }
