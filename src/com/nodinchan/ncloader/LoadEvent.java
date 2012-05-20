@@ -1,5 +1,11 @@
 package com.nodinchan.ncloader;
 
+import java.util.jar.JarFile;
+
+import org.bukkit.event.Event;
+import org.bukkit.event.HandlerList;
+import org.bukkit.plugin.Plugin;
+
 /*     Copyright (C) 2012  Nodin Chan <nodinchan@live.com>
  * 
  *     This program is free software: you can redistribute it and/or modify
@@ -15,12 +21,6 @@ package com.nodinchan.ncloader;
  *     You should have received a copy of the GNU General Public License
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-import java.util.jar.JarFile;
-
-import org.bukkit.event.Event;
-import org.bukkit.event.HandlerList;
-import org.bukkit.plugin.Plugin;
 
 /**
  * LoadEvent - Called when a Loadable has been loaded

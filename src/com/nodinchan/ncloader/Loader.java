@@ -1,21 +1,5 @@
 package com.nodinchan.ncloader;
 
-/*     Copyright (C) 2012  Nodin Chan <nodinchan@live.com>
- * 
- *     This program is free software: you can redistribute it and/or modify
- *     it under the terms of the GNU General Public License as published by
- *     the Free Software Foundation, either version 3 of the License, or
- *     (at your option) any later version.
- * 
- *     This program is distributed in the hope that it will be useful,
- *     but WITHOUT ANY WARRANTY; without even the implied warranty of
- *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *     GNU General Public License for more details.
- * 
- *     You should have received a copy of the GNU General Public License
- *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
@@ -33,6 +17,22 @@ import java.util.logging.Logger;
 
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
+
+/*     Copyright (C) 2012  Nodin Chan <nodinchan@live.com>
+ * 
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
+ * 
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ * 
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 /**
  * Loader - Loader base for loading Loadables
@@ -54,7 +54,7 @@ public class Loader<T extends Loadable> implements Listener {
 	private final List<File> files;
 	private final List<T> loadables;
 	
-	public Loader(Plugin plugin, File dir, Object[] paramTypes) {
+	public Loader(Plugin plugin, File dir, Object... paramTypes) {
 		this.plugin = plugin;
 		this.paramTypes = paramTypes;
 		this.ctorParams = new ArrayList<Class<?>>();
@@ -105,17 +105,31 @@ public class Loader<T extends Loadable> implements Listener {
 				
 				if (mainClass != null) {
 					Class<?> clazz = Class.forName(mainClass, true, loader);
-					Class<? extends Loadable> loadableClass = clazz.asSubclass(Loadable.class);
-					Constructor<? extends Loadable> ctor = loadableClass.getConstructor(ctorParams.toArray(new Class<?>[0]));
-					T loadable = (T) ctor.newInstance(paramTypes);
 					
-					LoadEvent event = new LoadEvent(plugin, loadable, jarFile);
-					plugin.getServer().getPluginManager().callEvent(event);
+					if (clazz != null) {
+						Class<? extends Loadable> loadableClass = clazz.asSubclass(Loadable.class);
+						Constructor<? extends Loadable> ctor = loadableClass.getConstructor(ctorParams.toArray(new Class<?>[0]));
+						T loadable = (T) ctor.newInstance(paramTypes);
+						
+						LoadEvent event = new LoadEvent(plugin, loadable, jarFile);
+						plugin.getServer().getPluginManager().callEvent(event);
+						
+						loadable.init();
+						loadables.add(loadable);
+						
+					} else { throw new ClassNotFoundException(); }
 					
-					loadable.init();
-					loadables.add(loadable);
-					
-				} else { throw new Exception(); }
+				} else { throw new ClassNotFoundException(); }
+				
+			} catch (ClassCastException e) {
+				e.printStackTrace();
+				getLogger().log(Level.WARNING, "The JAR file " + file.getName() + " is in the wrong directory");
+				getLogger().log(Level.WARNING, "The JAR file " + file.getName() + " failed to load");
+				
+			} catch (ClassNotFoundException e) {
+				e.printStackTrace();
+				getLogger().log(Level.WARNING, "Invalid path.yml");
+				getLogger().log(Level.WARNING, "The JAR file " + file.getName() + " failed to load");
 				
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -124,15 +138,6 @@ public class Loader<T extends Loadable> implements Listener {
 		}
 		
 		return loadables;
-	}
-	
-	/**
-	 * Registers the Event Listener
-	 * 
-	 * @param loader The Loader to register
-	 */
-	public void register(Loader<T> loader) {
-		plugin.getServer().getPluginManager().registerEvents(loader, plugin);
 	}
 	
 	/**
