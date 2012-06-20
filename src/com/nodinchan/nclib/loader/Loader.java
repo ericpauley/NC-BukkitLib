@@ -139,6 +139,7 @@ public class Loader<T extends Loadable> implements Listener {
 				
 			} catch (Exception e) {
 				e.printStackTrace();
+				getLogger().log(Level.WARNING, "Unknown cause");
 				getLogger().log(Level.WARNING, "The JAR file " + file.getName() + " failed to load");
 			}
 		}

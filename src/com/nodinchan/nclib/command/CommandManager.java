@@ -21,6 +21,22 @@ import com.nodinchan.nclib.command.info.CommandInfo;
 import com.nodinchan.nclib.command.info.CommandPermission;
 import com.nodinchan.nclib.command.info.CommandUsage;
 
+/*     Copyright (C) 2012  Nodin Chan <nodinchan@live.com>
+ * 
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
+ * 
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ * 
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 public final class CommandManager implements CommandExecutor {
 	
 	private final JavaPlugin plugin;
@@ -42,7 +58,15 @@ public final class CommandManager implements CommandExecutor {
 	}
 	
 	public Executor getExecutor(Command command, String name) {
-		return executors.get(command).get(aliases.get(command).get(name.toLowerCase()).toLowerCase());
+		if (command == null || name == null)
+			return null;
+		
+		String subName = aliases.get(command).get(name.toLowerCase());
+		
+		if (subName == null)
+			return null;
+		
+		return executors.get(command).get(subName.toLowerCase());
 	}
 	
 	@Override
@@ -68,7 +92,9 @@ public final class CommandManager implements CommandExecutor {
 						return true;
 					}
 					
-					String[] arguments = Arrays.copyOfRange(args, 1, args.length);
+					int to = (args.length > executor.getMaximumArgumentLength()) ? executor.getMaximumArgumentLength() : args.length;
+					
+					String[] arguments = Arrays.copyOfRange(args, 1, to);
 					
 					try {
 						executor.getMethod().invoke(command, sender, arguments);
@@ -92,11 +118,16 @@ public final class CommandManager implements CommandExecutor {
 				}
 			}
 			
-			command.invalidCommand(sender);
+			sender.sendMessage(command.invalidCommand(sender));
 			return true;
 		}
 		
 		return false;
+	}
+	
+	public PluginCommand register(String cmd) {
+		PluginCommand command = new PluginCommand(cmd, plugin);
+		return command;
 	}
 	
 	public org.bukkit.command.Command regsiterCommand(Command cmd) {
