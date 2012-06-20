@@ -1,4 +1,4 @@
-package com.nodinchan.dynamic.permission;
+package com.nodinchan.nclib.permission;
 
 import java.util.Map;
 
