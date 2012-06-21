@@ -72,14 +72,18 @@ public abstract class Command {
 	 * 
 	 * @return An array of messages to be sent to the command sender
 	 */
-	public abstract String[] invalidCommand(CommandSender sender);
+	public String[] invalidCommand(CommandSender sender) { return new String[0]; }
 	
 	/**
 	 * Called when the sender did not provide any arguments
 	 * 
 	 * @param sender The sender of the command
 	 */
-	public abstract void main(CommandSender sender);
+	public void main(CommandSender sender) {}
+	
+	public boolean isMain() {
+		return true;
+	}
 	
 	/**
 	 * Executor - 
@@ -93,23 +97,18 @@ public abstract class Command {
 		
 		private final Method method;
 		
-		private final String name;
-		private final String description;
-		private final String[] aliases;
-		private final String usage;
+		private String name;
+		private String description;
+		private String[] aliases;
+		private String usage;
 		
-		private final int maxArgLength;
-		private final int minArgLength;
+		private int maxArgLength;
+		private int minArgLength;
 		
 		public Executor(Command command, Method method) {
 			this.command = command;
 			this.method = method;
-			this.name = method.getAnnotation(CommandInfo.class).name();
-			this.description = method.getAnnotation(CommandDescription.class).description();
-			this.aliases = method.getAnnotation(CommandAlias.class).aliases();
-			this.usage = method.getAnnotation(CommandUsage.class).usage();
-			this.maxArgLength = method.getAnnotation(CommandInfo.class).maxArgs();
-			this.minArgLength = method.getAnnotation(CommandInfo.class).minArgs();
+			init(method);
 		}
 		
 		@Override
@@ -156,6 +155,32 @@ public abstract class Command {
 		
 		public String getUsage() {
 			return usage;
+		}
+		
+		private void init(Method method) {
+			CommandAlias alias = method.getAnnotation(CommandAlias.class);
+			CommandDescription description = method.getAnnotation(CommandDescription.class);
+			CommandInfo info = method.getAnnotation(CommandInfo.class);
+			CommandUsage usage = method.getAnnotation(CommandUsage.class);
+			
+			this.name = info.name();
+			this.maxArgLength = info.maxArgs();
+			this.minArgLength = info.minArgs();
+			
+			if (alias != null)
+				this.aliases = method.getAnnotation(CommandAlias.class).aliases();
+			else
+				this.aliases = new String[0];
+			
+			if (description != null)
+				this.description = method.getAnnotation(CommandDescription.class).description();
+			else
+				this.description = "";
+			
+			if (usage != null)
+				this.usage = method.getAnnotation(CommandUsage.class).usage();
+			else
+				this.usage = "";
 		}
 		
 		@Override

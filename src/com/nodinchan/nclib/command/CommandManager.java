@@ -3,8 +3,11 @@ package com.nodinchan.nclib.command;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 
@@ -43,6 +46,8 @@ public final class CommandManager implements CommandExecutor {
 	
 	private final CommandMap commandMap;
 	
+	private final List<Command> queue;
+	
 	private final Map<Command, Map<String, String>> aliases;
 	private final Map<String, Command> commands;
 	private final Map<Command, Map<String, Executor>> executors;
@@ -52,6 +57,7 @@ public final class CommandManager implements CommandExecutor {
 		Field field = plugin.getServer().getClass().getField("commandMap");
 		field.setAccessible(true);
 		this.commandMap = (CommandMap) field.get(plugin.getServer());
+		this.queue = new ArrayList<Command>();
 		this.aliases = new LinkedHashMap<Command, Map<String, String>>();
 		this.commands = new LinkedHashMap<String, Command>();
 		this.executors = new LinkedHashMap<Command, Map<String, Executor>>();
@@ -97,7 +103,7 @@ public final class CommandManager implements CommandExecutor {
 					String[] arguments = Arrays.copyOfRange(args, 1, to);
 					
 					try {
-						executor.getMethod().invoke(command, sender, arguments);
+						executor.execute(sender, arguments);
 						return true;
 						
 					} catch (IllegalAccessException e) {
@@ -135,22 +141,38 @@ public final class CommandManager implements CommandExecutor {
 		CommandDescription description = cmd.getClass().getAnnotation(CommandDescription.class);
 		CommandInfo info = cmd.getClass().getAnnotation(CommandInfo.class);
 		CommandUsage usage = cmd.getClass().getAnnotation(CommandUsage.class);
+		CommandPermission permission = cmd.getClass().getAnnotation(CommandPermission.class);
 		
-		if (alias == null || description == null || info == null || usage == null)
+		if (info == null)
 			return null;
 		
 		PluginCommand command = new PluginCommand(info.name(), plugin);
-		command.setAliases(Arrays.asList(alias.aliases()));
-		command.setDescription(description.description());
-		command.setUsage(usage.usage());
 		
-		if (command.getClass().getAnnotation(CommandPermission.class) != null)
-			command.setPermission(command.getClass().getAnnotation(CommandPermission.class).permission());
+		if (alias != null)
+			command.setAliases(Arrays.asList(alias.aliases()));
+		
+		if (description != null)
+			command.setDescription(description.description());
+		
+		if (usage != null)
+			command.setUsage(usage.usage());
+		
+		if (permission != null)
+			command.setPermission(permission.permission());
 		
 		command.setExecutor(this);
-		register(cmd);
 		
-		commands.put(command.getName(), cmd);
+		if (cmd.isMain())
+			commands.put(command.getName(), cmd);
+		
+		queue.add(cmd);
+		
+		for (Iterator<Command> commands = queue.iterator(); commands.hasNext();) {
+			if (this.commands.get(command.getName()) != null) {
+				register(this.commands.get(command.getName()), commands.next());
+				commands.remove();
+			}
+		}
 		
 		if (commandMap.register(command.getName(), plugin.getDescription().getPrefix(), command))
 			return command;
@@ -158,30 +180,25 @@ public final class CommandManager implements CommandExecutor {
 			return plugin.getCommand(command.getName());
 	}
 	
-	private void register(Command cmd) {
+	private void register(Command main, Command cmd) {
 		for (Method method : cmd.getClass().getMethods()) {
-			CommandAlias alias = method.getAnnotation(CommandAlias.class);
-			CommandDescription description = method.getAnnotation(CommandDescription.class);
-			CommandInfo info = method.getAnnotation(CommandInfo.class);
-			CommandUsage usage = method.getAnnotation(CommandUsage.class);
-			
-			if (alias == null || description == null || info == null || usage == null)
+			if (method.getAnnotation(CommandInfo.class) == null)
 				continue;
 			
 			Executor executor = new Executor(cmd, method);
 			
-			if (aliases.get(cmd) == null)
-				aliases.put(cmd, new LinkedHashMap<String, String>());
+			if (aliases.get(main) == null)
+				aliases.put(main, new LinkedHashMap<String, String>());
 			
-			if (executors.get(cmd) == null)
-				executors.put(cmd, new LinkedHashMap<String, Executor>());
+			if (executors.get(main) == null)
+				executors.put(main, new LinkedHashMap<String, Executor>());
 			
-			aliases.get(cmd).put(executor.getName(), executor.getName());
+			aliases.get(main).put(executor.getName(), executor.getName());
 			
 			for (String cmdAlias : executor.getAliases())
-				aliases.get(cmd).put(cmdAlias, executor.getName());
+				aliases.get(main).put(cmdAlias, executor.getName());
 			
-			executors.get(cmd).put(executor.getName(), executor);
+			executors.get(main).put(executor.getName(), executor);
 		}
 	}
 }
