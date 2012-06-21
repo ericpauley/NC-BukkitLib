@@ -15,7 +15,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandMap;
 import org.bukkit.command.CommandSender;
-import org.bukkit.craftbukkit.CraftServer;
+import org.bukkit.plugin.SimplePluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.nodinchan.ncbukkit.command.Command.Executor;
@@ -55,9 +55,9 @@ public final class CommandManager implements CommandExecutor {
 	
 	public CommandManager(JavaPlugin plugin) throws IllegalArgumentException, IllegalAccessException, NoSuchFieldException, SecurityException {
 		this.plugin = plugin;
-		Field field = CraftServer.class.getDeclaredField("commandMap");
+		Field field = SimplePluginManager.class.getDeclaredField("commandMap");
 		field.setAccessible(true);
-		this.commandMap = (CommandMap) field.get(plugin.getServer());
+		this.commandMap = (CommandMap) field.get(plugin.getServer().getPluginManager());
 		this.queue = new ArrayList<Command>();
 		this.aliases = new LinkedHashMap<Command, Map<String, String>>();
 		this.commands = new LinkedHashMap<String, Command>();
@@ -134,6 +134,7 @@ public final class CommandManager implements CommandExecutor {
 	
 	public PluginCommand register(String cmd) {
 		PluginCommand command = new PluginCommand(cmd, plugin);
+		commandMap.register(plugin.getDescription().getPrefix(), command);
 		return command;
 	}
 	
