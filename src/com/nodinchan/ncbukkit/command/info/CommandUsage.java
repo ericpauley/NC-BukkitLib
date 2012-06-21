@@ -1,4 +1,4 @@
-package com.nodinchan.nclib.command.info;
+package com.nodinchan.ncbukkit.command.info;
 
 /*     Copyright (C) 2012  Nodin Chan <nodinchan@live.com>
  * 
@@ -16,7 +16,7 @@ package com.nodinchan.nclib.command.info;
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-public @interface CommandAlias {
+public @interface CommandUsage {
 	
-	String[] aliases() default {};
+	String usage() default "/<command>";
 }

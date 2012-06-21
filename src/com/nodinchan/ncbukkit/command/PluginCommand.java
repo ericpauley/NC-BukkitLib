@@ -1,4 +1,4 @@
-package com.nodinchan.nclib.command;
+package com.nodinchan.ncbukkit.command;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandException;

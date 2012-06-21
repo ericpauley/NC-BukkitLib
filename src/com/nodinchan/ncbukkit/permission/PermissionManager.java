@@ -1,4 +1,4 @@
-package com.nodinchan.nclib.permission;
+package com.nodinchan.ncbukkit.permission;
 
 import java.util.Map;
 

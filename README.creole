@@ -1,4 +1,4 @@
-== NCLib
+== NC-BukkitLib
 
 -----------------------------------------------------------------------------------------------------------------------
 
@@ -15,12 +15,12 @@ Add and call this method in your plugin:
 			File destination = new File(getDataFolder().getParentFile().getParentFile(), "lib");
 			destination.mkdirs();
 			
-			File lib = new File(destination, "NCLib.jar");
+			File lib = new File(destination, "NC-BukkitLib.jar");
 			
 			boolean download = false;
 			
 			if (!lib.exists()) {
-				System.out.println("Missing NC lib");
+				System.out.println("Missing NC-Bukkit lib");
 				download = true;
 				
 			} else {
@@ -40,15 +40,15 @@ Add and call this method in your plugin:
 				
 				if (!download) {
 					if (version == 0) {
-						System.out.println("NC lib outdated");
+						System.out.println("NC-Bukkit lib outdated");
 						download = true;
 						
 					} else {
-						HttpURLConnection urlConnection = (HttpURLConnection) new URL("http://www.nodinchan.com/NCLib/version.yml").openConnection();
+						HttpURLConnection urlConnection = (HttpURLConnection) new URL("http://www.nodinchan.com/NC-BukkitLib/version.yml").openConnection();
 						BufferedReader reader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
 						
-						if (Double.parseDouble(reader.readLine().replace("NCLib Version ", "").trim()) > version) {
-							System.out.println("NC lib outdated");
+						if (Double.parseDouble(reader.readLine().replace("NC-BukkitLib Version ", "").trim()) > version) {
+							System.out.println("NC-Bukkit lib outdated");
 							download = true;
 						}
 					}
@@ -56,12 +56,12 @@ Add and call this method in your plugin:
 			}
 			
 			if (download) {
-				System.out.println("Downloading NC lib...");
-				URL url = new URL("http://www.nodinchan.com/NCLib/NCLib.jar");
+				System.out.println("Downloading NC-Bukkit lib...");
+				URL url = new URL("http://www.nodinchan.com/NC-BukkitLib/NC-BukkitLib.jar");
 				ReadableByteChannel rbc = Channels.newChannel(url.openStream());
 				FileOutputStream output = new FileOutputStream(lib);
 				output.getChannel().transferFrom(rbc, 0, 1 << 24);
-				System.out.println("Downloaded NC lib");
+				System.out.println("Downloaded NC-Bukkit lib");
 			}
 			
 			URLClassLoader sysLoader = (URLClassLoader) ClassLoader.getSystemClassLoader();

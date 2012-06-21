@@ -1,4 +1,4 @@
-package com.nodinchan.nclib.command;
+package com.nodinchan.ncbukkit.command;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -7,10 +7,10 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import com.nodinchan.nclib.command.info.CommandAlias;
-import com.nodinchan.nclib.command.info.CommandDescription;
-import com.nodinchan.nclib.command.info.CommandInfo;
-import com.nodinchan.nclib.command.info.CommandUsage;
+import com.nodinchan.ncbukkit.command.info.CommandAlias;
+import com.nodinchan.ncbukkit.command.info.CommandDescription;
+import com.nodinchan.ncbukkit.command.info.CommandInfo;
+import com.nodinchan.ncbukkit.command.info.CommandUsage;
 
 /*     Copyright (C) 2012  Nodin Chan <nodinchan@live.com>
  * 

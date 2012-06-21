@@ -1,4 +1,4 @@
-package com.nodinchan.nclib.loader;
+package com.nodinchan.ncbukkit.loader;
 
 import java.io.File;
 import java.io.IOException;
