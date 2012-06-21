@@ -47,7 +47,7 @@ Add and call this method in your plugin:
 						HttpURLConnection urlConnection = (HttpURLConnection) new URL("http://www.nodinchan.com/NCLib/version.yml").openConnection();
 						BufferedReader reader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
 						
-						if (Double.parseDouble(reader.readLine().replace("NC Version ", "").trim()) > version) {
+						if (Double.parseDouble(reader.readLine().replace("NCLib Version ", "").trim()) > version) {
 							System.out.println("NC lib outdated");
 							download = true;
 						}
