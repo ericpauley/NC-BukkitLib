@@ -82,7 +82,7 @@ public class Command {
 	public void main(CommandSender sender) {}
 	
 	public boolean isMain() {
-		return true;
+		return false;
 	}
 	
 	/**
