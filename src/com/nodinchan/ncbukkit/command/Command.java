@@ -28,7 +28,7 @@ import com.nodinchan.ncbukkit.command.info.CommandUsage;
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-public abstract class Command {
+public class Command {
 	
 	protected final JavaPlugin plugin;
 	

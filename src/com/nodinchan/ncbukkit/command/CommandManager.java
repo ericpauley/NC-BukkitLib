@@ -132,10 +132,12 @@ public final class CommandManager implements CommandExecutor {
 		return false;
 	}
 	
-	public PluginCommand register(String cmd) {
+	public org.bukkit.command.Command register(String cmd) {
 		PluginCommand command = new PluginCommand(cmd, plugin);
-		commandMap.register(plugin.getDescription().getPrefix(), command);
-		return command;
+		if (commandMap.register(plugin.getDescription().getPrefix(), command))
+			return command;
+		else
+			return plugin.getCommand(command.getName());
 	}
 	
 	public org.bukkit.command.Command regsiterCommand(Command cmd) {
