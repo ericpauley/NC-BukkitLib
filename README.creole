@@ -6,84 +6,57 @@ Add and call this method in your plugin:
 
 {{{
 	/**
-	 * Initialises the NCLib
-	 * 
-	 * @return True if the Lib is initialised
+	 * Initialises the library
 	 */
-	private boolean initLib() {
+	private void initLib() {
+		PluginManager pm = getServer().getPluginManager();
+		
+		NCBL libPlugin = (NCBL) pm.getPlugin("NC-BukkitLib");
+		
+		File lib = new File(getDataFolder().getParentFile(), "NC-BukkitLib.jar");
+		
+		boolean download = false;
+		
+		Element element = null;
+		
 		try {
-			File destination = new File(getDataFolder().getParentFile().getParentFile(), "lib");
-			destination.mkdirs();
-			
-			File lib = new File(destination, "NC-BukkitLib.jar");
-			
-			boolean download = false;
-			
-			if (!lib.exists()) {
+			if (libPlugin == null) {
 				System.out.println("Missing NC-Bukkit lib");
 				download = true;
 				
 			} else {
-				JarFile jarFile = new JarFile(lib);
+				double currentVer = Double.parseDouble(libPlugin.getDescription().getVersion());
+				double newVer = 0.0;
 				
-				double version = 0;
+				URL rss = new URL("http://dev.bukkit.org/server-mods/nc-bukkitlib/files.rss");
 				
-				if (jarFile.getEntry("version.yml") != null) {
-					JarEntry element = jarFile.getJarEntry("version.yml");
-					BufferedReader reader = new BufferedReader(new InputStreamReader(jarFile.getInputStream(element)));
-					version = Double.parseDouble(reader.readLine().substring(9).trim());
-					
-				} else {
-					System.out.println("Missing version.yml");
-					download = true;
+				Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(rss.openConnection().getInputStream());
+				doc.getDocumentElement().normalize();
+				
+				Node node = doc.getElementsByTagName("item").item(0);
+				
+				if (node.getNodeType() == 1) {
+					element = (Element) node;
+					Element name = (Element) element.getElementsByTagName("title").item(0);
+					newVer = Double.parseDouble(name.getChildNodes().item(0).getNodeValue().split(" ")[1].trim().substring(1));
 				}
 				
-				if (!download) {
-					if (version == 0) {
-						System.out.println("NC-Bukkit lib outdated");
-						download = true;
-						
-					} else {
-						HttpURLConnection urlConnection = (HttpURLConnection) new URL("http://www.nodinchan.com/NC-BukkitLib/version.yml").openConnection();
-						BufferedReader reader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
-						
-						if (Double.parseDouble(reader.readLine().replace("NC-BukkitLib Version ", "").trim()) > version) {
-							System.out.println("NC-Bukkit lib outdated");
-							download = true;
-						}
-					}
+				if (newVer > currentVer) {
+					System.out.println("NC-Bukkit lib outdated");
+					download = true;
 				}
 			}
 			
-			if (download) {
+			if (download && element != null) {
 				System.out.println("Downloading NC-Bukkit lib...");
-				URL url = new URL("http://www.nodinchan.com/NC-BukkitLib/NC-BukkitLib.jar");
+				URL url = new URL(element.getElementsByTagName("link").item(0).getChildNodes().item(0).getNodeValue());
 				ReadableByteChannel rbc = Channels.newChannel(url.openStream());
 				FileOutputStream output = new FileOutputStream(lib);
 				output.getChannel().transferFrom(rbc, 0, 1 << 24);
 				System.out.println("Downloaded NC-Bukkit lib");
 			}
 			
-			URLClassLoader sysLoader = (URLClassLoader) ClassLoader.getSystemClassLoader();
-			
-			for (URL url : sysLoader.getURLs()) {
-				if (url.sameFile(lib.toURI().toURL()))
-					return true;
-			}
-			
-			try {
-				Method method = URLClassLoader.class.getDeclaredMethod("addURL", URL.class);
-				method.setAccessible(true);
-				method.invoke(sysLoader, lib.toURI().toURL());
-				
-			} catch (Exception e) { return false; }
-			
-			return true;
-			
-		} catch (Exception e) { e.printStackTrace(); }
-		
-		return false;
-	}
-}}}
+		} catch (Exception e) {}
+	}}}}
 
 -----------------------------------------------------------------------------------------------------------------------
