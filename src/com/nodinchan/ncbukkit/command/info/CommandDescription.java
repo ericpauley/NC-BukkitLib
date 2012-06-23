@@ -18,5 +18,5 @@ package com.nodinchan.ncbukkit.command.info;
 
 public @interface CommandDescription {
 	
-	String description() default "";
+	String value() default "";
 }

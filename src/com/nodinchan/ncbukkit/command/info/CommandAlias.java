@@ -18,5 +18,5 @@ package com.nodinchan.ncbukkit.command.info;
 
 public @interface CommandAlias {
 	
-	String[] aliases() default {};
+	String[] value() default {};
 }

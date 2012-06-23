@@ -18,5 +18,5 @@ package com.nodinchan.ncbukkit.command.info;
 
 public @interface CommandUsage {
 	
-	String usage() default "/<command>";
+	String value() default "/<command>";
 }

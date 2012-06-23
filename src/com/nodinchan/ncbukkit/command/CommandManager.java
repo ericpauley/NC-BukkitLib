@@ -132,12 +132,12 @@ public final class CommandManager implements CommandExecutor {
 		return false;
 	}
 	
-	public org.bukkit.command.Command register(String cmd) {
+	public PluginCommand register(String cmd) {
 		PluginCommand command = new PluginCommand(cmd, plugin);
 		if (commandMap.register(plugin.getDescription().getPrefix(), command))
 			return command;
 		else
-			return plugin.getCommand(command.getName());
+			return null;
 	}
 	
 	public org.bukkit.command.Command regsiterCommand(Command cmd) {
@@ -150,19 +150,19 @@ public final class CommandManager implements CommandExecutor {
 		if (info == null)
 			return null;
 		
-		PluginCommand command = new PluginCommand(info.name(), plugin);
+		PluginCommand command = new PluginCommand(info.value(), plugin);
 		
 		if (alias != null)
-			command.setAliases(Arrays.asList(alias.aliases()));
+			command.setAliases(Arrays.asList(alias.value()));
 		
 		if (description != null)
-			command.setDescription(description.description());
+			command.setDescription(description.value());
 		
 		if (usage != null)
-			command.setUsage(usage.usage());
+			command.setUsage(usage.value());
 		
 		if (permission != null)
-			command.setPermission(permission.permission());
+			command.setPermission(permission.value());
 		
 		command.setExecutor(this);
 		

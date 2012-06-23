@@ -1,0 +1,14 @@
+name: NC-BukkitLib
+version: 2.0
+author: NodinChan
+website: http://dev.bukkit.org/server-mods/nc-bukkitlib/
+main: com.nodinchan.ncbukkit.NCBL
+prefix: NCBL
+commands:
+    ncbl:
+        description: Gives info about the NC-BukkitLib
+        usage: /<command>
+permissions:
+    NCBL.update:
+        description: Notified about updates on log on
+        default: op

@@ -48,7 +48,7 @@ public class Command {
 	 */
 	public final void invalidArgLength(CommandSender sender, Command main) {
 		sender.sendMessage("[" + plugin.getName() + "] " + ChatColor.RED + "Invalid Argument Length");
-		sender.sendMessage("[" + plugin.getName() + "] Usage: /" + main.getClass().getAnnotation(CommandUsage.class).usage());
+		sender.sendMessage("[" + plugin.getName() + "] Usage: /" + main.getClass().getAnnotation(CommandUsage.class).value());
 	}
 	
 	/**
@@ -163,29 +163,29 @@ public class Command {
 			CommandInfo info = method.getAnnotation(CommandInfo.class);
 			CommandUsage usage = method.getAnnotation(CommandUsage.class);
 			
-			this.name = info.name();
+			this.name = info.value();
 			this.maxArgLength = info.maxArgs();
 			this.minArgLength = info.minArgs();
 			
 			if (alias != null)
-				this.aliases = method.getAnnotation(CommandAlias.class).aliases();
+				this.aliases = method.getAnnotation(CommandAlias.class).value();
 			else
 				this.aliases = new String[0];
 			
 			if (description != null)
-				this.description = method.getAnnotation(CommandDescription.class).description();
+				this.description = method.getAnnotation(CommandDescription.class).value();
 			else
 				this.description = "";
 			
 			if (usage != null)
-				this.usage = method.getAnnotation(CommandUsage.class).usage();
+				this.usage = method.getAnnotation(CommandUsage.class).value();
 			else
 				this.usage = "";
 		}
 		
 		@Override
 		public String toString() {
-			return "Command:" + method.getAnnotation(CommandInfo.class).name();
+			return "Command:" + method.getAnnotation(CommandInfo.class).value();
 		}
 	}
 }

@@ -18,5 +18,5 @@ package com.nodinchan.ncbukkit.command.info;
 
 public @interface CommandPermission {
 	
-	String permission();
+	String value();
 }

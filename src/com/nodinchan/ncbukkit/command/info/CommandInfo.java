@@ -18,7 +18,7 @@ package com.nodinchan.ncbukkit.command.info;
 
 public @interface CommandInfo {
 	
-	String name();
+	String value();
 	
 	int minArgs() default 0;
 	
