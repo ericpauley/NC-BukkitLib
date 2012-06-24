@@ -13,50 +13,70 @@ Add and call this method in your plugin:
 		
 		NCBL libPlugin = (NCBL) pm.getPlugin("NC-BukkitLib");
 		
-		File lib = new File(getDataFolder().getParentFile(), "NC-BukkitLib.jar");
+		File destination = new File(getDataFolder().getParentFile().getParentFile(), "lib");
+		destination.mkdirs();
 		
+		File lib = new File(destination, "NC-BukkitLib.jar");
+		File pluginLib = new File(getDataFolder().getParentFile(), "NC-BukkitLib.jar");
+		
+		boolean inPlugins = false;
 		boolean download = false;
 		
 		Element element = null;
 		
 		try {
+			URL rss = new URL("http://dev.bukkit.org/server-mods/nc-bukkitlib/files.rss");
+			
+			Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(rss.openConnection().getInputStream());
+			doc.getDocumentElement().normalize();
+			
+			Node node = doc.getElementsByTagName("item").item(0);
+			
+			if (node.getNodeType() == 1)
+				element = (Element) node;
+			else
+				throw new Exception();
+			
 			if (libPlugin == null) {
-				System.out.println("Missing NC-Bukkit lib");
+				getLogger().log(Level.INFO, "Missing NC-Bukkit lib");
+				inPlugins = true;
 				download = true;
 				
 			} else {
 				double currentVer = Double.parseDouble(libPlugin.getDescription().getVersion());
 				double newVer = 0.0;
 				
-				URL rss = new URL("http://dev.bukkit.org/server-mods/nc-bukkitlib/files.rss");
-				
-				Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(rss.openConnection().getInputStream());
-				doc.getDocumentElement().normalize();
-				
-				Node node = doc.getElementsByTagName("item").item(0);
-				
-				if (node.getNodeType() == 1) {
-					element = (Element) node;
-					Element name = (Element) element.getElementsByTagName("title").item(0);
-					newVer = Double.parseDouble(name.getChildNodes().item(0).getNodeValue().split(" ")[1].trim().substring(1));
-				}
+				Element name = (Element) element.getElementsByTagName("title").item(0);
+				newVer = Double.parseDouble(name.getChildNodes().item(0).getNodeValue().split(" ")[1].trim().substring(1));
 				
 				if (newVer > currentVer) {
-					System.out.println("NC-Bukkit lib outdated");
+					getLogger().log(Level.INFO, "NC-Bukkit lib outdated");
 					download = true;
 				}
 			}
 			
-			if (download && element != null) {
-				System.out.println("Downloading NC-Bukkit lib...");
-				URL url = new URL(element.getElementsByTagName("link").item(0).getChildNodes().item(0).getNodeValue());
-				ReadableByteChannel rbc = Channels.newChannel(url.openStream());
-				FileOutputStream output = new FileOutputStream(lib);
-				output.getChannel().transferFrom(rbc, 0, 1 << 24);
-				System.out.println("Downloaded NC-Bukkit lib");
+			if (download) {
+				if (inPlugins) {
+					getLogger().log(Level.INFO, "Downloading NC-Bukkit lib...");
+					URL url = new URL(element.getElementsByTagName("link").item(0).getChildNodes().item(0).getNodeValue());
+					ReadableByteChannel rbc = Channels.newChannel(url.openStream());
+					FileOutputStream output = new FileOutputStream(pluginLib);
+					output.getChannel().transferFrom(rbc, 0, 1 << 24);
+					getLogger().log(Level.INFO, "Downloaded NC-Bukkit lib");
+					
+				} else {
+					System.out.println("Downloading NC-Bukkit lib...");
+					URL url = new URL(element.getElementsByTagName("link").item(0).getChildNodes().item(0).getNodeValue());
+					ReadableByteChannel rbc = Channels.newChannel(url.openStream());
+					FileOutputStream output = new FileOutputStream(lib);
+					output.getChannel().transferFrom(rbc, 0, 1 << 24);
+					getLogger().log(Level.INFO, "Downloaded NC-Bukkit lib");
+					getLogger().log(Level.INFO, "NC-BukkitLib downloaded into the lib folder");
+					getLogger().log(Level.INFO, "Please replace the one in the plugins folder and restart server");
+				}
 			}
 			
-		} catch (Exception e) {}
+		} catch (Exception e) { System.out.println("Failed to check for library update"); }
 	}
 }}}
 
