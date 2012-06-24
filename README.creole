@@ -6,9 +6,9 @@ Add and call this method in your plugin:
 
 {{{
 	/**
-	 * Initialises the library
+	 * Checks for update of the library
 	 */
-	private void initLib() {
+	private void updateLib() {
 		PluginManager pm = getServer().getPluginManager();
 		
 		NCBL libPlugin = (NCBL) pm.getPlugin("NC-BukkitLib");
@@ -76,7 +76,9 @@ Add and call this method in your plugin:
 				}
 			}
 			
-		} catch (Exception e) { System.out.println("Failed to check for library update"); }
+		} catch (Exception e) {
+			System.out.println("Failed to check for library update");
+		}
 	}
 }}}
 
