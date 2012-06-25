@@ -5,6 +5,7 @@ import org.bukkit.command.CommandException;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.java.JavaPlugin;
 
 /*     Copyright (C) 2012  Nodin Chan <nodinchan@live.com>
  * 
@@ -22,12 +23,12 @@ import org.bukkit.plugin.Plugin;
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-public final class PluginCommand extends Command {
+public class PluginCommand extends Command {
 	
-	private final Plugin plugin;
+	private final JavaPlugin plugin;
 	private CommandExecutor executor;
-
-	protected PluginCommand(String name, Plugin plugin) {
+	
+	protected PluginCommand(String name, JavaPlugin plugin) {
 		super(name);
 		this.plugin = plugin;
 		this.executor = plugin;

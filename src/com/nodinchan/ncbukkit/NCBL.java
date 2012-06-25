@@ -25,8 +25,10 @@ public final class NCBL extends JavaPlugin implements Listener {
 	
 	private static final Logger log = Logger.getLogger("TitanLog");
 	
-	private double currentVer;
+	private final double currentVer = Double.parseDouble(getDescription().getVersion().trim());
 	private double newVer;
+	
+	private final String NAME = "[" + ChatColor.GOLD + "NC-BukkitLib" + ChatColor.WHITE + "]";
 	
 	public void log(Level level, String msg) {
 		log.log(level, "[" + this + "]" + msg);
@@ -37,7 +39,7 @@ public final class NCBL extends JavaPlugin implements Listener {
 		if (cmd.getName().equalsIgnoreCase("ncbl")) {
 			if (args.length > 0 && args[0].equalsIgnoreCase("update") && sender.hasPermission("NCBL.update")) {
 				try {
-					URL url = new URL("http://dev.bukkit.org/server-mods/deathnotifier/files.rss");
+					URL url = new URL("http://dev.bukkit.org/server-mods/nc-bukkitlib/files.rss");
 					
 					Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(url.openConnection().getInputStream());
 					doc.getDocumentElement().normalize();
@@ -54,9 +56,9 @@ public final class NCBL extends JavaPlugin implements Listener {
 				} catch (Exception e) { this.newVer = Double.valueOf(getDescription().getVersion().trim()); }
 				
 				String message = ChatColor.GOLD + "%new" + ChatColor.DARK_PURPLE + " is out! You are running " + ChatColor.GOLD + "%current";
-				sender.sendMessage(message.replace("%new", newVer + "").replace("%current", currentVer + ""));
+				sender.sendMessage(NAME + " " + message.replace("%new", newVer + "").replace("%current", currentVer + ""));
 				
-			} else { sender.sendMessage("[NC-BukkitLib] You are running v" + getDescription().getVersion()); }
+			} else { sender.sendMessage(NAME + " " + ChatColor.DARK_PURPLE + "You are running v" + getDescription().getVersion()); }
 			
 			return true;
 		}
