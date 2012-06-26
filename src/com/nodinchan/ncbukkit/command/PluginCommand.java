@@ -58,14 +58,29 @@ public class PluginCommand extends Command {
 		return success;
 	}
 	
+	/**
+	 * Gets the executor of the command
+	 * 
+	 * @return The command executor
+	 */
 	public CommandExecutor getExecutor() {
 		return executor;
 	}
 	
+	/**
+	 * Gets the plugin that owns the command
+	 * 
+	 * @return The plugin that owns the command
+	 */
 	public Plugin getPlugin() {
 		return plugin;
 	}
 	
+	/**
+	 * Sets executor of the command
+	 * 
+	 * @param executor The command executor to set to
+	 */
 	public void setExecutor(CommandExecutor executor) {
 		this.executor = executor;
 	}

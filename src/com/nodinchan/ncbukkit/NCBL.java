@@ -1,6 +1,5 @@
 package com.nodinchan.ncbukkit;
 
-import java.io.IOException;
 import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -29,6 +28,25 @@ public final class NCBL extends JavaPlugin implements Listener {
 	private double newVer;
 	
 	private final String NAME = "[" + ChatColor.GOLD + "NC-BukkitLib" + ChatColor.WHITE + "]";
+	
+	/**
+	 * Initialises Metrics
+	 * 
+	 * @return True is Metrics is initialised
+	 */
+	private boolean initMetrics() {
+		log(Level.INFO, "Hooking Metrics");
+		
+		try {
+			Metrics metrics = new Metrics(this);
+			
+			if (metrics.isOptOut())
+				return true;
+			
+			return metrics.start();
+			
+		} catch (Exception e) { return false; }
+	}
 	
 	public void log(Level level, String msg) {
 		log.log(level, "[" + this + "]" + msg);
@@ -75,7 +93,8 @@ public final class NCBL extends JavaPlugin implements Listener {
 	public void onEnable() {
 		getServer().getPluginManager().registerEvents(this, this);
 		
-		try { new Metrics(this).start(); } catch (IOException e) { e.printStackTrace(); }
+		if (!initMetrics())
+			log(Level.WARNING, "Failed to hook into Metrics");
 		
 		log(Level.INFO, "is now enabled");
 	}

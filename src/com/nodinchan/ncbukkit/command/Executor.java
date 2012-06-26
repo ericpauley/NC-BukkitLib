@@ -1,6 +1,5 @@
 package com.nodinchan.ncbukkit.command;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import org.bukkit.command.CommandSender;
@@ -31,11 +30,14 @@ public final class Executor {
 	
 	private final Method method;
 	
+	private final CommandManager manager;
+	
 	private final String permission;
 	
-	public Executor(CommandBase command, Method method) {
+	public Executor(CommandBase command, Method method, CommandManager manager) {
 		this.command = command;
 		this.method = method;
+		this.manager = manager;
 		
 		if (method.getAnnotation(Permission.class) != null)
 			permission = method.getAnnotation(Permission.class).value();
@@ -43,26 +45,53 @@ public final class Executor {
 			permission = "";
 	}
 	
-	public void execute(CommandSender sender, String[] args) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+	/**
+	 * Called when onCommand is called in the CommandManager
+	 * 
+	 * @param sender The command sender
+	 * 
+	 * @param args The given arguments
+	 * 
+	 * @throws Exception
+	 */
+	public void execute(CommandSender sender, String[] args) throws Exception {
 		if (!permission.equals("") && !sender.hasPermission(permission)) {
 			command.noPermission(sender);
 			return;
 		}
 		
+		Class<?>[] parameters = method.getParameterTypes();
+		
+		Object[] params = new Object[parameters.length];
+		
 		if (sender instanceof Player) {
-			if (method.getParameterTypes()[0].isAssignableFrom(Player.class))
-				method.invoke(command, (Player) sender, args);
-			else
-				command.invalidSender(sender);
+			if (parameters[0].isAssignableFrom(Player.class)) {
+				params[0] = (Player) sender;
+				
+			} else { command.invalidSender(sender); return; }
 			
 		} else {
-			if (method.getParameterTypes()[0].isAssignableFrom(ConsoleCommandSender.class))
-				method.invoke(command, (ConsoleCommandSender) sender, args);
-			else
-				command.invalidSender(sender);
+			if (parameters[0].isAssignableFrom(ConsoleCommandSender.class)) {
+				params[0] = (ConsoleCommandSender) sender;
+				
+			} else { command.invalidSender(sender); return; }
 		}
+		
+		for (int parameter = 1; parameter < parameters.length; parameter++) {
+			try {
+				params[parameter] = manager.castParameter(parameters[parameter], args[parameter - 1]);
+				
+			} catch (IndexOutOfBoundsException e) { break; }
+		}
+		
+		method.invoke(command, params);
 	}
 	
+	/**
+	 * Gets the permission required to use the sub-command
+	 * 
+	 * @return The required permission
+	 */
 	public String getPermission() {
 		return permission;
 	}
