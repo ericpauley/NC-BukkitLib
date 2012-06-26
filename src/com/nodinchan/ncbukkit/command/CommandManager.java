@@ -77,8 +77,8 @@ public final class CommandManager {
 	 * @throws Exception
 	 */
 	public void onCommand(CommandSender sender, String command, String[] args) throws Exception {
-		if (executors.get(command) != null) {
-			Executor executor = executors.get(command).get(args[0]);
+		if (executors.get(command.toLowerCase()) != null) {
+			Executor executor = executors.get(command.toLowerCase()).get(args[0].toLowerCase());
 			
 			if (executor != null) {
 				executor.execute(sender, Arrays.copyOfRange(args, 1, args.length));
@@ -102,23 +102,34 @@ public final class CommandManager {
 			if (method.getAnnotation(Command.class) == null)
 				continue;
 			
-			if (executors.get(command.getName()).get(method.getName()) != null)
-				continue;
-			
 			Executor executor = new Executor(command, method, this);
 			
-			if (executors.get(command.getName()).get(method.getName()) == null)
-				executors.get(command.getName()).put(method.getName(), executor);
+			if (executors.get(command.getName().toLowerCase()).get(method.getName().toLowerCase()) == null)
+				executors.get(command.getName().toLowerCase()).put(method.getName().toLowerCase(), executor);
 			
 			if (method.getAnnotation(Aliases.class) != null) {
 				for (String alias : method.getAnnotation(Aliases.class).value()) {
-					if (executors.get(command.getName()).get(alias) != null)
+					if (executors.get(command.getName().toLowerCase()).get(alias.toLowerCase()) != null)
 						continue;
 					
-					executors.get(command.getName()).put(alias, executor);
+					executors.get(command.getName().toLowerCase()).put(alias.toLowerCase(), executor);
 				}
 			}
 		}
+	}
+	
+	public org.bukkit.command.Command registerCommand(String command) {
+		if (plugin == null || command == null)
+			return null;
+		
+		PluginCommand pCommand = new PluginCommand(command, plugin);
+		
+		String prefix = plugin.getDescription().getPrefix();
+		
+		if (commandMap.register(command, (prefix != null) ? prefix : plugin.getName(), pCommand))
+			return pCommand;
+		else
+			return plugin.getCommand(command);
 	}
 	
 	/**
@@ -158,11 +169,11 @@ public final class CommandManager {
 		for (Parameter<?> param : command.getUsedParameters())
 			newParameter(param);
 		
-		if (executors.get(command.getName()) == null)
-			executors.put(command.getName(), new HashMap<String, Executor>());
+		if (executors.get(command.getName().toLowerCase()) == null)
+			executors.put(command.getName().toLowerCase(), new HashMap<String, Executor>());
 		
-		if (commands.get(command.getName()) == null)
-			commands.put(command.getName(), command);
+		if (commands.get(command.getName().toLowerCase()) == null)
+			commands.put(command.getName().toLowerCase(), command);
 		
 		register(command);
 		
