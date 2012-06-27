@@ -118,7 +118,7 @@ public final class CommandManager {
 		}
 	}
 	
-	public org.bukkit.command.Command registerCommand(String command) {
+	public PluginCommand registerCommand(String command) {
 		if (plugin == null || command == null)
 			return null;
 		
@@ -129,7 +129,7 @@ public final class CommandManager {
 		if (commandMap.register(command, (prefix != null) ? prefix : plugin.getName(), pCommand))
 			return pCommand;
 		else
-			return plugin.getCommand(command);
+			return null;
 	}
 	
 	/**

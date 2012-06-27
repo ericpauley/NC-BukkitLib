@@ -1,6 +1,8 @@
 package com.nodinchan.ncbukkit;
 
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -19,15 +21,23 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import com.nodinchan.ncbukkit.metrics.Metrics;
+import com.nodinchan.ncbukkit.metrics.Metrics.Graph;
+import com.nodinchan.ncbukkit.metrics.Metrics.Plotter;
 
 public final class NCBL extends JavaPlugin implements Listener {
+	
+	private final String NAME = "[" + ChatColor.GOLD + "NC-BukkitLib" + ChatColor.WHITE + "]";
 	
 	private static final Logger log = Logger.getLogger("TitanLog");
 	
 	private final double currentVer = Double.parseDouble(getDescription().getVersion().trim());
 	private double newVer;
 	
-	private final String NAME = "[" + ChatColor.GOLD + "NC-BukkitLib" + ChatColor.WHITE + "]";
+	private final List<String> plugins = new ArrayList<String>();
+	
+	public void hook(JavaPlugin plugin) {
+		plugins.add(plugin.getName());
+	}
 	
 	/**
 	 * Initialises Metrics
@@ -42,6 +52,20 @@ public final class NCBL extends JavaPlugin implements Listener {
 			
 			if (metrics.isOptOut())
 				return true;
+			
+			Graph plugins = metrics.createGraph("Hooked Plugins");
+			
+			for (String plugin : this.plugins) {
+				plugins.addPlotter(new Plotter(plugin) {
+					
+					@Override
+					public int getValue() {
+						return 1;
+					}
+				});
+			}
+			
+			metrics.addGraph(plugins);
 			
 			return metrics.start();
 			
@@ -86,6 +110,7 @@ public final class NCBL extends JavaPlugin implements Listener {
 	
 	@Override
 	public void onDisable() {
+		plugins.clear();
 		log(Level.INFO, "is now disabled");
 	}
 	
