@@ -30,7 +30,7 @@ public final class NCBL extends JavaPlugin implements Listener {
 	
 	private static final Logger log = Logger.getLogger("TitanLog");
 	
-	private final double currentVer = Double.parseDouble(getDescription().getVersion().trim());
+	private double currentVer;
 	private double newVer;
 	
 	private final List<String> plugins = new ArrayList<String>();
@@ -116,6 +116,25 @@ public final class NCBL extends JavaPlugin implements Listener {
 	
 	@Override
 	public void onEnable() {
+		currentVer = Double.parseDouble(getDescription().getVersion().trim());
+		
+		try {
+			URL url = new URL("http://dev.bukkit.org/server-mods/nc-bukkitlib/files.rss");
+			
+			Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(url.openConnection().getInputStream());
+			doc.getDocumentElement().normalize();
+			
+			Node node = doc.getElementsByTagName("item").item(0);
+			
+			if (node.getNodeType() == 1) {
+				Element element = (Element) node;
+				Element name = (Element) element.getElementsByTagName("title").item(0);
+				this.newVer = Double.valueOf(name.getChildNodes().item(0).getNodeValue().split(" ")[1].trim().substring(1));
+				
+			} else { this.newVer = Double.valueOf(getDescription().getVersion().trim()); }
+			
+		} catch (Exception e) { this.newVer = Double.valueOf(getDescription().getVersion().trim()); }
+		
 		getServer().getPluginManager().registerEvents(this, this);
 		
 		if (!initMetrics())
