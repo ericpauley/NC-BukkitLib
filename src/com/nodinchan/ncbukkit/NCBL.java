@@ -24,6 +24,22 @@ import com.nodinchan.ncbukkit.metrics.Metrics;
 import com.nodinchan.ncbukkit.metrics.Metrics.Graph;
 import com.nodinchan.ncbukkit.metrics.Metrics.Plotter;
 
+/*     Copyright (C) 2012  Nodin Chan <nodinchan@live.com>
+ * 
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
+ * 
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ * 
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 public final class NCBL extends JavaPlugin implements Listener {
 	
 	private final String NAME = "[" + ChatColor.GOLD + "NC-BukkitLib" + ChatColor.WHITE + "]";
@@ -36,6 +52,9 @@ public final class NCBL extends JavaPlugin implements Listener {
 	private final List<String> plugins = new ArrayList<String>();
 	
 	public void hook(JavaPlugin plugin) {
+		if (plugins.contains(plugin.getName()))
+			return;
+		
 		plugins.add(plugin.getName());
 	}
 	
