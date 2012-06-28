@@ -6,6 +6,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 
+import com.nodinchan.ncbukkit.command.info.Async;
 import com.nodinchan.ncbukkit.command.info.Permission;
 
 /*     Copyright (C) 2012  Nodin Chan <nodinchan@live.com>
@@ -34,10 +35,14 @@ public final class Executor {
 	
 	private final String permission;
 	
+	private final boolean async;
+	
 	public Executor(CommandBase command, Method method, CommandManager manager) {
 		this.command = command;
 		this.method = method;
 		this.manager = manager;
+		
+		this.async = method.isAnnotationPresent(Async.class);
 		
 		if (method.getAnnotation(Permission.class) != null)
 			permission = method.getAnnotation(Permission.class).value();
@@ -94,5 +99,13 @@ public final class Executor {
 	 */
 	public String getPermission() {
 		return permission;
+	}
+
+	/**
+	 * Gets whether or not this command should be run in a separate thread, as signaled by the @Async notification
+	 * @return Whether or not threading should be used
+	 */
+	public boolean isAsync() {
+		return async;
 	}
 }

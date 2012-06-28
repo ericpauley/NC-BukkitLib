@@ -92,20 +92,37 @@ public final class CommandManager {
 	 * 
 	 * @throws Exception
 	 */
-	public void onCommand(CommandSender sender, String command, String[] args) throws Exception {
+	public void onCommand(final CommandSender sender, String command, final String[] args)/* throws Exception */{
 		if (executors.get(command.toLowerCase()) != null) {
-			Executor executor = executors.get(command.toLowerCase()).get(args[0].toLowerCase());
+			final Executor executor = executors.get(command.toLowerCase()).get(args[0].toLowerCase());
 			
 			if (executor != null) {
-				executor.execute(sender, Arrays.copyOfRange(args, 1, args.length));
-				return;
+				Runnable r = new Runnable(){
+
+					public void run() {
+						try{
+							executor.execute(sender, Arrays.copyOfRange(args, 1, args.length));
+						}catch(Exception e){
+							throw new RuntimeException(e);
+						}
+					}
+					
+				};
+				if(executor.isAsync()){
+					new Thread(r).start();
+				}else{
+					r.run();
+				}
+				
+			}else{
+				commands.get(command).commandNotFound(sender, args);
+
 			}
-			
-			commands.get(command).commandNotFound(sender, args);
-			return;
+		}else{
+			sender.sendMessage("[" + plugin.getName() + "] Unknown command");
+
 		}
 		
-		sender.sendMessage("[" + plugin.getName() + "] Unknown command");
 	}
 	
 	/**
