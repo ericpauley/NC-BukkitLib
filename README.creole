@@ -29,12 +29,12 @@ Add and call this method in your plugin:
 			JSONArray versions = (JSONArray) jsonPlugin.get("versions");
 			
 			if (libPlugin == null) {
-				getLogger().log(Level.INFO, "Missing NC-Bukkit lib");
+				getLogger().log(Level.WARNING, "Missing NC-Bukkit lib");
 				inPlugins = true;
 				download = true;
 				
 			} else {
-				double currentVer = Double.parseDouble(libPlugin.getDescription().getVersion());
+				double currentVer = libPlugin.getVersion();
 				double newVer = currentVer;
 				
 				for (int ver = 0; ver < versions.size(); ver++) {
@@ -47,13 +47,13 @@ Add and call this method in your plugin:
 				}
 				
 				if (newVer > currentVer) {
-					getLogger().log(Level.INFO, "NC-Bukkit lib outdated");
+					getLogger().log(Level.WARNING, "NC-Bukkit lib outdated");
 					download = true;
 				}
 			}
 			
 			if (download) {
-				System.out.println("Downloading NC-Bukkit lib...");
+				getLogger().log(Level.INFO, "Downloading NC-Bukkit lib");
 				
 				String dl_link = "";
 				
@@ -87,7 +87,7 @@ Add and call this method in your plugin:
 				getLogger().log(Level.INFO, "Downloaded NC-Bukkit lib");
 			}
 			
-		} catch (Exception e) { System.out.println("Failed to check for library update"); }
+		} catch (Exception e) { getLogger().log(Level.WARNING, "Failed to check for library update"); }
 	}
 }}}
 
