@@ -42,12 +42,12 @@ import com.nodinchan.ncbukkit.metrics.Metrics.Plotter;
 
 public final class NCBL extends JavaPlugin implements Listener {
 	
-	private final String NAME = "[" + ChatColor.GOLD + "NC-BukkitLib" + ChatColor.WHITE + "]";
+	private final String NAME = "[" + ChatColor.GOLD + "NC-BukkitLib" + ChatColor.WHITE + "] ";
 	
 	private static final Logger log = Logger.getLogger("TitanLog");
 	
-	private double currentVer;
-	private double newVer;
+	private final double currentVer = 2.1;
+	private double newVer = currentVer;
 	
 	private final List<String> plugins = new ArrayList<String>();
 	
@@ -111,15 +111,17 @@ public final class NCBL extends JavaPlugin implements Listener {
 						Element element = (Element) node;
 						Element name = (Element) element.getElementsByTagName("title").item(0);
 						this.newVer = Double.valueOf(name.getChildNodes().item(0).getNodeValue().split(" ")[1].trim().substring(1));
-						
-					} else { this.newVer = Double.valueOf(getDescription().getVersion().trim()); }
+					}
 					
-				} catch (Exception e) { this.newVer = Double.valueOf(getDescription().getVersion().trim()); }
+				} catch (Exception e) {}
 				
-				String message = ChatColor.GOLD + "%new" + ChatColor.DARK_PURPLE + " is out! You are running " + ChatColor.GOLD + "%current";
-				sender.sendMessage(NAME + " " + message.replace("%new", newVer + "").replace("%current", currentVer + ""));
+				if (newVer > currentVer) {
+					String message = ChatColor.GOLD + "%new" + ChatColor.DARK_PURPLE + " is out! You are running " + ChatColor.GOLD + "%current";
+					sender.sendMessage(NAME + message.replace("%new", newVer + "").replace("%current", currentVer + ""));
+					
+				} else { sender.sendMessage(NAME + "Version up to date"); }
 				
-			} else { sender.sendMessage(NAME + " " + ChatColor.DARK_PURPLE + "You are running v" + getDescription().getVersion()); }
+			} else { sender.sendMessage(NAME + " " + ChatColor.DARK_PURPLE + "You are running v" + currentVer); }
 			
 			return true;
 		}
@@ -135,8 +137,6 @@ public final class NCBL extends JavaPlugin implements Listener {
 	
 	@Override
 	public void onEnable() {
-		currentVer = Double.parseDouble(getDescription().getVersion().trim());
-		
 		try {
 			URL url = new URL("http://dev.bukkit.org/server-mods/nc-bukkitlib/files.rss");
 			
@@ -149,10 +149,9 @@ public final class NCBL extends JavaPlugin implements Listener {
 				Element element = (Element) node;
 				Element name = (Element) element.getElementsByTagName("title").item(0);
 				this.newVer = Double.valueOf(name.getChildNodes().item(0).getNodeValue().split(" ")[1].trim().substring(1));
-				
-			} else { this.newVer = Double.valueOf(getDescription().getVersion().trim()); }
+			}
 			
-		} catch (Exception e) { this.newVer = Double.valueOf(getDescription().getVersion().trim()); }
+		} catch (Exception e) {}
 		
 		getServer().getPluginManager().registerEvents(this, this);
 		
@@ -162,7 +161,7 @@ public final class NCBL extends JavaPlugin implements Listener {
 		log(Level.INFO, "is now enabled");
 	}
 	
-	@EventHandler(priority = EventPriority.MONITOR)
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void onPlayerJoin(PlayerJoinEvent event) {
 		if (event.getPlayer().hasPermission("NCBL.update")) {
 			if (newVer > currentVer) {

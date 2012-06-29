@@ -92,37 +92,33 @@ public final class CommandManager {
 	 * 
 	 * @throws Exception
 	 */
-	public void onCommand(final CommandSender sender, String command, final String[] args)/* throws Exception */{
+	public void onCommand(final CommandSender sender, String command, final String[] args) {
 		if (executors.get(command.toLowerCase()) != null) {
 			final Executor executor = executors.get(command.toLowerCase()).get(args[0].toLowerCase());
 			
 			if (executor != null) {
-				Runnable r = new Runnable(){
-
+				Runnable thread = new Runnable() {
+					
 					public void run() {
-						try{
+						try {
 							executor.execute(sender, Arrays.copyOfRange(args, 1, args.length));
-						}catch(Exception e){
+						} catch (Exception e) {
 							throw new RuntimeException(e);
 						}
 					}
-					
 				};
-				if(executor.isAsync()){
-					new Thread(r).start();
-				}else{
-					r.run();
-				}
 				
-			}else{
-				commands.get(command).commandNotFound(sender, args);
-
+				if (executor.isAsync())
+					new Thread(thread).start();
+				else
+					thread.run();
 			}
-		}else{
-			sender.sendMessage("[" + plugin.getName() + "] Unknown command");
-
+			
+			commands.get(command).commandNotFound(sender, args);
+			return;
 		}
 		
+		sender.sendMessage("[" + plugin.getName() + "] Unknown command");
 	}
 	
 	/**
@@ -132,7 +128,7 @@ public final class CommandManager {
 	 */
 	private void register(CommandBase command) {
 		for (Method method : command.getClass().getDeclaredMethods()) {
-			if (method.getAnnotation(Command.class) == null)
+			if (!method.isAnnotationPresent(Command.class))
 				continue;
 			
 			Executor executor = new Executor(command, method, this);
@@ -140,7 +136,7 @@ public final class CommandManager {
 			if (executors.get(command.getName().toLowerCase()).get(method.getName().toLowerCase()) == null)
 				executors.get(command.getName().toLowerCase()).put(method.getName().toLowerCase(), executor);
 			
-			if (method.getAnnotation(Aliases.class) != null) {
+			if (method.isAnnotationPresent(Aliases.class)) {
 				for (String alias : method.getAnnotation(Aliases.class).value()) {
 					if (executors.get(command.getName().toLowerCase()).get(alias.toLowerCase()) != null)
 						continue;

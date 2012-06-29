@@ -44,7 +44,7 @@ public final class Executor {
 		
 		this.async = method.isAnnotationPresent(Async.class);
 		
-		if (method.getAnnotation(Permission.class) != null)
+		if (method.isAnnotationPresent(Permission.class))
 			permission = method.getAnnotation(Permission.class).value();
 		else
 			permission = "";
