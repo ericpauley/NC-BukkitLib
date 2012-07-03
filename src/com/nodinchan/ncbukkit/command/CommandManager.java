@@ -74,7 +74,7 @@ public final class CommandManager {
 	 * 
 	 * @param parameter
 	 */
-	private void newParameter(Parameter<?> parameter) {
+	public void newParameter(Parameter<?> parameter) {
 		if (params.get(parameter.castTo()) != null)
 			return;
 		
