@@ -39,9 +39,15 @@ public class Loadable implements Cloneable {
 	private FileConfiguration config;
 	
 	private JarFile jar;
+	private File dataFolder;
 	
 	public Loadable(String name) {
 		this.name = name;
+	}
+	
+	File datafolder(File dataFolder) {
+		dataFolder.mkdirs();
+		return this.dataFolder = dataFolder;
 	}
 	
 	/**
@@ -67,9 +73,7 @@ public class Loadable implements Cloneable {
 	 * @return The directory of this
 	 */
 	public File getDataFolder() {
-		File dir = new File(getName());
-		dir.mkdir();
-		return dir;
+		return dataFolder;
 	}
 	
 	/**

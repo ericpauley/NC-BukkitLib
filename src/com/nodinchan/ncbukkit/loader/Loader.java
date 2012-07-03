@@ -119,8 +119,9 @@ public class Loader<T extends Loadable> implements Listener {
 						LoadEvent event = new LoadEvent(plugin, loadable, jarFile);
 						plugin.getServer().getPluginManager().callEvent(event);
 						
-						loadable.init();
 						loadable.jar(jarFile);
+						loadable.datafolder(new File(file.getParentFile(), loadable.getName()));
+						loadable.init();
 						loadables.add(loadable);
 						
 					} else { throw new ClassNotFoundException(); }

@@ -62,7 +62,7 @@ public final class CommandManager {
 	 * 
 	 * @throws Exception
 	 */
-	protected Object castParameter(Class<?> clazz, String argument) throws Exception {
+	public Object castParameter(Class<?> clazz, String argument) throws Exception {
 		if (params.get(clazz) != null)
 			return params.get(clazz).cast(argument);
 		

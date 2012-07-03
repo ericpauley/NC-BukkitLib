@@ -51,6 +51,15 @@ public final class NCBL extends JavaPlugin implements Listener {
 	
 	private final List<String> plugins = new ArrayList<String>();
 	
+	@Override
+	public Logger getLogger() {
+		return log;
+	}
+	
+	public double getVersion() {
+		return currentVer;
+	}
+	
 	public void hook(JavaPlugin plugin) {
 		if (plugins.contains(plugin.getName()))
 			return;
@@ -92,7 +101,7 @@ public final class NCBL extends JavaPlugin implements Listener {
 	}
 	
 	public void log(Level level, String msg) {
-		log.log(level, "[" + this + "]" + msg);
+		log.log(level, "[" + this + "] " + msg);
 	}
 	
 	@Override
